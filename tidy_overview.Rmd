@@ -3,7 +3,6 @@ title: "tidyverse overview"
 author: "Andrew Ghazi"
 date: "March 25th 2021"
 output:
-  beamer_presentation: default
   ioslides_presentation:
     widescreen: yes
 editor_options:
@@ -13,6 +12,14 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+## While people are joining the meeting
+
+1. Install stuff 
+  1. [Rstudio](rstudio.com) - `rstudio.com`
+  2. the tidyverse with this R command: `install.packages("tidyverse")`
+2. Get the slides and/or code if you'd like to follow along:
+  - [github.com/andrewGhazi/tidy_overview](github.com/andrewGhazi/tidy_overview)
 
 ## What is the tidyverse?
 
