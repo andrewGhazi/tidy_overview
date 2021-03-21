@@ -11,15 +11,16 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(knitr.duplicate.label = "allow")
+knitr::purl("./tidy_overview.Rmd", output = "R/tidy_overview.R")
 ```
 
 ## While people are joining the meeting
 
-1. Install stuff 
-  1. [Rstudio](rstudio.com) - `rstudio.com`
-  2. the tidyverse with this R command: `install.packages("tidyverse")`
-2. Get the slides and/or code if you'd like to follow along:
-  - [github.com/andrewGhazi/tidy_overview](github.com/andrewGhazi/tidy_overview)
+1. Install R from [cran.r-project.org](cran.r-project.org)
+2. Install Rstudio from [rstudio.com](rstudio.com)
+3. Install the tidyverse with this R command: `install.packages("tidyverse")`
+4. Get the slides (.html) and/or code (.R) if you'd like to follow along: [github.com/andrewGhazi/tidy_overview](github.com/andrewGhazi/tidy_overview)
 
 ## What is the tidyverse?
 
