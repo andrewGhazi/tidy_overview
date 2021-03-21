@@ -37,11 +37,44 @@ knitr::include_graphics('images/tidyverse-logo.png')
 
 ## Why use the tidyverse?
 
-- Shared design philosophy --> consistency
-- Design goal: Lower your cognitive burden
+- Design goal: Lower the cognitive burden on users
+- Shared design philosophy --> inter-package consistency
 - Easy to learn, write, and read
-- Other people use it
+- It's ubiquitous
 
+## Outline
+
+<div class="columns-2">
+* Basic concepts
+* Package overview
+* End-to-end example
+* Questions
+
+
+<br/><br/><br/>
+```{r out.width="100%", echo = FALSE}
+knitr::include_graphics("images/data-science.png")
+```
+
+</div>
+
+## Outline
+
+<div class="columns-2">
+* Basic concepts
+* Package overview
+* End-to-end example
+* Questions
+
+
+<br/><br/><br/><br/>
+```{r out.width="100%", echo = FALSE}
+knitr::include_graphics("images/data-science.png")
+```
+```{r echo = FALSE, out.width="100%"}
+knitr::include_graphics('images/kitchen.jpg')
+```
+</div>
 ## A note
 
 Lecture notes show up like this.
@@ -60,12 +93,6 @@ The startup message lists loaded packages and overwritten functions.
 ```{r}
 library(tidyverse)
 ```
-
-## Help
-
-To look at the documentation for any function, use `?` or `help()`
-
-How to read help: https://socviz.co/appendix.html#a-little-more-about-r
 
 # Basic concepts
 
@@ -90,6 +117,12 @@ diabetes
 diabetes
 ```
 
+## tidyverse functions
+
+- Function names are *verbs*
+  - e.g. `filter`, `arrange`, `mutate`
+- data frame in, data frame out
+
 ## Pipes
 
 * Pipes look like this: `%>%`
@@ -102,7 +135,7 @@ c(1,2,3,4) %>% mean
 
 * Verbalize as: "and then".
 
-* "Set up this vector and then take the mean".
+* "Create this vector and then take the mean".
 
 ## Pipe example
 
@@ -165,10 +198,18 @@ input %>%
   stick(where = 'stew')
 ```
 
-Piped code is easier to write *and easier to read*.
+- Piped code is easier to write *and easier to read*.
+- Keyboard shortcut: `ctrl + shift + M`
 
 # package overview 
 
+## Diabetes dataset
+
+* Adapted from R package `MASS` (not a tidyverse package)
+* Describes incidence of diabetes in 532 Pima Indian women along with several health-related variables
+```{r}
+diabetes
+```
 ## Import - `readr`
 
 <div class="columns-2">
@@ -188,6 +229,7 @@ knitr::include_graphics('images/readr.png')
 
 
 ```{r echo = FALSE, eval = FALSE}
+# this is how you prepare the diabetes dataset
 library(MASS)
 diabetes = rbind(Pima.tr, Pima.te) %>% 
   as_tibble %>% 
@@ -197,15 +239,6 @@ write_tsv(diabetes, 'data/diabetes.tsv')
 # This is rbind(Pima.tr, Pima.te) using the two datasets from the R package MASS (not a tidyverse package)
 ```
 </div>
-
-## Diabetes dataset
-
-* Adapted from R package `MASS` (not a tidyverse package)
-* Describes incidence of diabetes in 532 Pima Indian women along with several health-related variables
-```{r}
-diabetes
-```
-
 
 ## Manipulate - `dplyr`
 
@@ -347,8 +380,7 @@ knitr::include_graphics('images/geoms.png')
 <div class="columns-2">
 - Easily interweave code, $\LaTeX$ and text.
 - Render as reports (.html, .docx, .pdf), slides (.html, .ppt), or web applications (Shiny)
-- Example: these slides
-- Your PI will love you
+- Rmd + Github = Digital lab notebook
 - Demonstration at end of session 1 if there's time
 
 ```{r echo = FALSE, out.width="90%"}
@@ -357,7 +389,9 @@ knitr::include_graphics("images/rmd.png")
 
 </div>
 
-## COVID data
+# COVID-19 example
+
+## COVID-19 data
 
 * New York Times COVID-19 data on Github
 * Provides COVID-19 data by county, state, and nation-wide
@@ -365,7 +399,7 @@ knitr::include_graphics("images/rmd.png")
 
 ## Example: US COVID-19 state-level data
 
-```{r}
+```{r cache=TRUE}
 nyt_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
 state_covid = read_csv(nyt_url)
 ```
@@ -407,6 +441,8 @@ state_covid %>%
        caption = "Data from the New York Times: https://github.com/nytimes/covid-19-data") + 
   theme_bw()
 ```
+
+# Questions?
 
 # Day 2
 
@@ -591,6 +627,11 @@ tidyr::who %>%
 - `lubridate`
 - `tidymodels`
 
+## How to get help
+
+To look at the documentation for any function, use `?` or `help()`
+
+How to read help: https://socviz.co/appendix.html#a-little-more-about-r
 
 ## Resources
 

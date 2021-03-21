@@ -8,6 +8,17 @@ knitr::purl("./tidy_overview.Rmd", output = "R/tidy_overview.R")
 knitr::include_graphics('images/tidyverse-logo.png')
 
 
+## ----out.width="100%", echo = FALSE-------------------------------------------
+knitr::include_graphics("images/data-science.png")
+
+
+## ----out.width="100%", echo = FALSE-------------------------------------------
+knitr::include_graphics("images/data-science.png")
+
+## ----echo = FALSE, out.width="100%"-------------------------------------------
+knitr::include_graphics('images/kitchen.jpg')
+
+
 ## -----------------------------------------------------------------------------
 print('R code looks like this.')
 print('Console output has two pound symbols in front.')
@@ -72,6 +83,10 @@ input %>%
 ##   stick(where = 'stew')
 
 
+## -----------------------------------------------------------------------------
+diabetes
+
+
 ## ----message = FALSE----------------------------------------------------------
 data_path = "data/diabetes.tsv"
 diabetes = read_tsv(data_path)
@@ -81,6 +96,7 @@ knitr::include_graphics('images/readr.png')
 
 
 ## ----echo = FALSE, eval = FALSE-----------------------------------------------
+## # this is how you prepare the diabetes dataset
 ## library(MASS)
 ## diabetes = rbind(Pima.tr, Pima.te) %>%
 ##   as_tibble %>%
@@ -88,10 +104,6 @@ knitr::include_graphics('images/readr.png')
 ## write_tsv(diabetes, 'C:/Users/aghazi/tidy_overview/data/diabetes.tsv')
 ## write_tsv(diabetes, 'data/diabetes.tsv')
 ## # This is rbind(Pima.tr, Pima.te) using the two datasets from the R package MASS (not a tidyverse package)
-
-
-## -----------------------------------------------------------------------------
-diabetes
 
 
 ## ----echo=FALSE, out.height="95%", out.width="95%"----------------------------
@@ -171,7 +183,7 @@ knitr::include_graphics('images/geoms.png')
 knitr::include_graphics("images/rmd.png")
 
 
-## -----------------------------------------------------------------------------
+## ----cache=TRUE---------------------------------------------------------------
 nyt_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
 state_covid = read_csv(nyt_url)
 
