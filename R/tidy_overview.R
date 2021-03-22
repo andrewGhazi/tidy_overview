@@ -1,24 +1,3 @@
-## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
-options(knitr.duplicate.label = "allow")
-knitr::purl("./tidy_overview.Rmd", output = "R/tidy_overview.R")
-
-
-## ----echo=FALSE, out.height="95%", out.width="95%"----------------------------
-knitr::include_graphics('images/tidyverse-logo.png')
-
-
-## ----out.width="100%", echo = FALSE-------------------------------------------
-knitr::include_graphics("images/data-science.png")
-
-
-## ----out.width="100%", echo = FALSE-------------------------------------------
-knitr::include_graphics("images/data-science.png")
-
-## ----echo = FALSE, out.width="100%"-------------------------------------------
-knitr::include_graphics('images/kitchen.jpg')
-
-
 ## -----------------------------------------------------------------------------
 print('R code looks like this.')
 print('Console output has two pound symbols in front.')
@@ -45,12 +24,8 @@ diabetes
 c(1,2,3,4) %>% mean
 
 
-## ----echo = FALSE, out.width="75%"--------------------------------------------
-knitr::include_graphics('images/top.jpg')
 
 
-## ----echo = FALSE, out.width="75%"--------------------------------------------
-knitr::include_graphics('images/a83830605363b094e15f5dfb6bfa7862.jpg')
 
 
 ## ----echo = FALSE-------------------------------------------------------------
@@ -91,8 +66,6 @@ diabetes
 data_path = "data/diabetes.tsv"
 diabetes = read_tsv(data_path)
 
-## ----echo = FALSE, out.width="90%"--------------------------------------------
-knitr::include_graphics('images/readr.png')
 
 
 ## ----echo = FALSE, eval = FALSE-----------------------------------------------
@@ -106,8 +79,6 @@ knitr::include_graphics('images/readr.png')
 ## # This is rbind(Pima.tr, Pima.te) using the two datasets from the R package MASS (not a tidyverse package)
 
 
-## ----echo=FALSE, out.height="95%", out.width="95%"----------------------------
-knitr::include_graphics('images/dplyr_logo.png')
 
 
 ## -----------------------------------------------------------------------------
@@ -158,8 +129,6 @@ diabetes %>%
             prop_diabetic = sum(diabetic == "Yes")/ n())
 
 
-## ----echo = FALSE, out.width = "90%"------------------------------------------
-knitr::include_graphics("images/ggplot2.png")
 
 
 ## ----fig.height=3.7-----------------------------------------------------------
@@ -175,12 +144,10 @@ diabetes %>%
   geom_boxplot()
 
 
-## ----echo = FALSE, out.height='100%', fig.align='center'----------------------
+## ----echo = FALSE, out.width='100%', fig.align='center'-----------------------
 knitr::include_graphics('images/geoms.png')
 
 
-## ----echo = FALSE, out.width="90%"--------------------------------------------
-knitr::include_graphics("images/rmd.png")
 
 
 ## ----cache=TRUE---------------------------------------------------------------

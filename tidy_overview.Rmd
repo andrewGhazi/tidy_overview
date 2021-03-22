@@ -9,7 +9,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, purl=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 options(knitr.duplicate.label = "allow")
 knitr::purl("./tidy_overview.Rmd", output = "R/tidy_overview.R")
@@ -30,7 +30,7 @@ knitr::purl("./tidy_overview.Rmd", output = "R/tidy_overview.R")
 
 - Install it with this R command: `install.packages('tidyverse')`
 
-```{r echo=FALSE, out.height="95%", out.width="95%"}
+```{r echo=FALSE, out.height="95%", out.width="95%", purl=FALSE}
 knitr::include_graphics('images/tidyverse-logo.png')
 ```
 </div>
@@ -52,7 +52,7 @@ knitr::include_graphics('images/tidyverse-logo.png')
 
 
 <br/><br/><br/>
-```{r out.width="100%", echo = FALSE}
+```{r out.width="100%", echo = FALSE, purl=FALSE}
 knitr::include_graphics("images/data-science.png")
 ```
 
@@ -68,10 +68,10 @@ knitr::include_graphics("images/data-science.png")
 
 
 <br/><br/><br/><br/>
-```{r out.width="100%", echo = FALSE}
+```{r out.width="100%", echo = FALSE, purl=FALSE}
 knitr::include_graphics("images/data-science.png")
 ```
-```{r echo = FALSE, out.width="100%"}
+```{r echo = FALSE, out.width="100%", purl=FALSE}
 knitr::include_graphics('images/kitchen.jpg')
 ```
 </div>
@@ -145,7 +145,7 @@ Why are pipes useful?
 
 Why are pipes useful?
 
-```{r echo = FALSE, out.width="75%"}
+```{r echo = FALSE, out.width="75%", purl=FALSE}
 knitr::include_graphics('images/top.jpg')
 ```
 
@@ -153,7 +153,7 @@ knitr::include_graphics('images/top.jpg')
 
 Why are pipes useful?
 
-```{r echo = FALSE, out.width="75%"}
+```{r echo = FALSE, out.width="75%", purl=FALSE}
 knitr::include_graphics('images/a83830605363b094e15f5dfb6bfa7862.jpg')
 ```
 
@@ -223,7 +223,7 @@ diabetes
 data_path = "data/diabetes.tsv"
 diabetes = read_tsv(data_path)
 ```
-```{r echo = FALSE, out.width="90%"}
+```{r echo = FALSE, out.width="90%", purl=FALSE}
 knitr::include_graphics('images/readr.png')
 ```
 
@@ -246,7 +246,7 @@ write_tsv(diabetes, 'data/diabetes.tsv')
 - Package for basic data manipulation
 - Most important functions: `filter()`, `select()`, `arrange()`, `mutate()`, `group_by()`, `summarise()`
 
-```{r echo=FALSE, out.height="95%", out.width="95%"}
+```{r echo=FALSE, out.height="95%", out.width="95%", purl=FALSE}
 knitr::include_graphics('images/dplyr_logo.png')
 ```
 </div>
@@ -348,7 +348,7 @@ diabetes %>%
   - Aesthetic mappings between variables and graphical elements: `aes()`
   - Graphical elements via `geom_*()` e.g. `geom_point()`
   
-```{r echo = FALSE, out.width = "90%"}
+```{r echo = FALSE, out.width = "90%", purl=FALSE}
 knitr::include_graphics("images/ggplot2.png")
 ```
   
@@ -372,7 +372,7 @@ diabetes %>%
 ```
 
 ## Visualize - `ggplot2`'s suite of geoms
-```{r echo = FALSE, out.height='100%', fig.align='center'}
+```{r echo = FALSE, out.width='100%', fig.align='center'}
 knitr::include_graphics('images/geoms.png')
 ```
 
@@ -383,7 +383,7 @@ knitr::include_graphics('images/geoms.png')
 - Rmd + Github = Digital lab notebook
 - Demonstration at end of session 1 if there's time
 
-```{r echo = FALSE, out.width="90%"}
+```{r echo = FALSE, out.width="90%", purl=FALSE}
 knitr::include_graphics("images/rmd.png")
 ```
 
