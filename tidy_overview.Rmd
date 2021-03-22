@@ -39,24 +39,13 @@ knitr::include_graphics('images/tidyverse-logo.png')
 
 - Design goal: Lower the cognitive burden on users
 - Shared design philosophy --> inter-package consistency
+- Focused on data science and statistical analysis
 - Easy to learn, write, and read
 - It's ubiquitous
 
-## Outline
-
-<div class="columns-2">
-* Basic concepts
-* Package overview
-* End-to-end example
-* Questions
-
-
-<br/><br/><br/>
 ```{r out.width="100%", echo = FALSE, purl=FALSE}
 knitr::include_graphics("images/data-science.png")
 ```
-
-</div>
 
 ## Outline
 
@@ -68,13 +57,12 @@ knitr::include_graphics("images/data-science.png")
 
 
 <br/><br/><br/><br/>
-```{r out.width="100%", echo = FALSE, purl=FALSE}
-knitr::include_graphics("images/data-science.png")
-```
+
 ```{r echo = FALSE, out.width="100%", purl=FALSE}
 knitr::include_graphics('images/kitchen.jpg')
 ```
 </div>
+
 ## A note
 
 Lecture notes show up like this.
@@ -289,6 +277,24 @@ diabetes %>%
   select(8, 1, 7)
 ```
 
+## `dplyr::select()`
+
+- Subset columns
+- Choose columns by name, index, or condition
+
+```{r}
+diabetes %>% 
+  select(starts_with('b'), matches('diab'))
+```
+
+## `dplyr::arrange()`
+
+- Reorder rows by a variable
+
+```{r}
+diabetes %>% arrange(bmi)
+```
+
 ## `dplyr::arrange()`
 
 - Reorder rows by a variable
@@ -311,6 +317,15 @@ input_df %>%
 ## `dplyr::mutate()`
 
 - Add new columns
+- Example: add an index
+```{r}
+diabetes %>% 
+  mutate(index = 1:532)
+```
+
+## `dplyr::mutate()`
+
+- Add new columns
 - Example: Calculate birth year as a function of age
 ```{r}
 diabetes %>% 
@@ -320,12 +335,11 @@ diabetes %>%
 ## `dplyr::group_by()`
 
 - Group a data frame
-- Example: mothers vs non-mothers:
+- Example: diabetic vs non-diabetic:
 
 ```{r}
 diabetes %>% 
-  mutate(is_mother = npreg > 0) %>% 
-  group_by(is_mother)
+  group_by(diabetic)
 ```
 
 ## `dplyr::summarise()`
@@ -334,10 +348,20 @@ diabetes %>%
 
 ```{r}
 diabetes %>% 
+  group_by(diabetic) %>% 
+  summarise(mean_age = mean(age))
+```
+
+## `dplyr::summarise()`
+
+- Compute summary values by group
+- You can group by multiple variables
+
+```{r}
+diabetes %>% 
   mutate(is_mother = npreg > 0) %>% 
-  group_by(is_mother) %>% 
-  summarise(mean_age = mean(age),
-            prop_diabetic = sum(diabetic == "Yes")/ n())
+  group_by(diabetic, is_mother) %>% 
+  summarise(mean_age = mean(age))
 ```
 
 ## Visualize - `ggplot2`
@@ -348,7 +372,7 @@ diabetes %>%
   - Aesthetic mappings between variables and graphical elements: `aes()`
   - Graphical elements via `geom_*()` e.g. `geom_point()`
   
-```{r echo = FALSE, out.width = "90%", purl=FALSE}
+```{r echo = FALSE, out.width = "80%", purl=FALSE}
 knitr::include_graphics("images/ggplot2.png")
 ```
   
@@ -357,28 +381,28 @@ knitr::include_graphics("images/ggplot2.png")
 ## Visualize - `ggplot2` example
 
 - Tidy input, aesthetic mapping, and a geom
-```{r fig.height=3.7}
+```{r fig.height=3.1}
 diabetes %>% 
-  ggplot(aes(x = bmi, y = glu)) + 
+  ggplot(mapping = aes(x = bmi, y = glu)) + 
   geom_point()
 ```
 
 ## Visualize - `ggplot2` example
-```{r fig.height=3.7}
+```{r fig.height=3.1}
 diabetes %>% 
   mutate(is_mother = npreg > 0) %>% 
-  ggplot(aes(x = is_mother, y = age)) + 
+  ggplot(aes(is_mother, age)) + 
   geom_boxplot()
 ```
 
 ## Visualize - `ggplot2`'s suite of geoms
-```{r echo = FALSE, out.width='100%', fig.align='center'}
+```{r echo = FALSE, out.width='75%', fig.align='center'}
 knitr::include_graphics('images/geoms.png')
 ```
 
 ## Report - `rmarkdown`
 <div class="columns-2">
-- Easily interweave code, $\LaTeX$ and text.
+- Easily interweave code, plots, $\LaTeX$, and text.
 - Render as reports (.html, .docx, .pdf), slides (.html, .ppt), or web applications (Shiny)
 - Rmd + Github = Digital lab notebook
 - Demonstration at end of session 1 if there's time
@@ -406,43 +430,155 @@ state_covid = read_csv(nyt_url)
 
 ## Example: US COVID-19 state-level data
 
+- Look at the data
+
 ```{r}
 state_covid
 ```
 
-## Example: US COVID-19
+## Example: COVID-19 in California
+
+- Plot one state over time
 
 ```{r eval = FALSE}
 state_covid %>% 
-  filter(state == "Washington") %>% 
-  mutate(new_deaths = c(NA, diff(deaths))) %>% 
-  ggplot(aes(date, new_deaths)) +
-  geom_point() + 
-  geom_smooth(method = "loess", span = .2) + 
-  labs(title = "Daily new deaths in Washington",
-       y = "New Deaths",
-       caption = "Data from the New York Times: https://github.com/nytimes/covid-19-data") + 
-  theme_bw()
+  filter(state == "California") %>% 
+  ggplot(aes(date, deaths)) +
+  geom_line()
 ```
 
 - What will the output of this command look like?
 
-## Example: US COVID-19
+## Example: COVID-19 in California
 
-```{r echo = FALSE, message = FALSE, warning = FALSE, out.width="90%"}
+- Plot one state over time
+
+```{r}
 state_covid %>% 
-  filter(state == "Washington") %>% 
-  mutate(new_deaths = c(NA, diff(deaths))) %>% 
+  filter(state == "California") %>% 
+  ggplot(aes(date, deaths)) +
+  geom_line()
+```
+
+## Example: COVID-19 in California
+
+- Want to define the CHANGE in deaths
+```{r eval = FALSE}
+state_covid %>% 
+  filter(state == "California", deaths > 0) 
+```
+
+## Example: COVID-19 in California
+
+- Define daily added deaths using `diff()`
+```{r eval=FALSE}
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = diff(deaths))
+```
+## Example: COVID-19 in California
+
+- Define daily added deaths using `diff()`
+```{r error=TRUE}
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = diff(deaths))
+```
+
+## That didn't work.
+
+- `diff()` returns a vector that's one element too short -- tack on the first observation at the start.
+
+```{r}
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) 
+```
+
+
+## Example: COVID-19 in California
+
+- Define daily added deaths using `diff()`
+```{r fig.height=3}
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) %>% 
+  ggplot(aes(date, new_deaths)) +
+  geom_point() 
+```
+
+## Example: Adding bells and whistles to a plot
+
+```{r eval = FALSE}
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) %>% 
   ggplot(aes(date, new_deaths)) +
   geom_point() + 
   geom_smooth(method = "loess", span = .2) + 
-  labs(title = "Daily new deaths in Washington",
+  labs(title = "Daily new deaths in California",
        y = "New Deaths",
        caption = "Data from the New York Times: https://github.com/nytimes/covid-19-data") + 
   theme_bw()
 ```
 
+
+## Example: COVID-19 in California
+
+```{r echo = FALSE, message = FALSE, warning = FALSE, out.width="90%"}
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) %>% 
+  ggplot(aes(date, new_deaths)) +
+  geom_point() + 
+  geom_smooth(method = "loess", span = .2) + 
+  labs(title = "Daily new deaths in California",
+       y = "New Deaths",
+       caption = "Data from the New York Times: https://github.com/nytimes/covid-19-data") + 
+  theme_bw()
+```
+
+- Further enhancement with a trendline, labels, and theme
 - Try plotting several states with different colors (hints: use `%in%` and `aes(color = ...)`)
+
+## Example: US COVID-19
+
+- What was the highest daily increase in death in any state?
+
+## Example: US COVID-19
+
+- What was the highest daily increase in death in any state?
+- What do we need to do?
+
+## Example: US COVID-19
+
+- What was the highest daily increase in death in any state?
+
+```{r}
+state_covid %>% 
+  group_by(state) %>% 
+  mutate(new_deaths = c(NA, diff(deaths))) %>% 
+  summarise(state_max = max(new_deaths, na.rm = TRUE)) %>% 
+  arrange(desc(state_max))
+```
+
+- Note: `mutate()` is aware of groups!
+
+# Before switching to RStudio...
+
+## How to get help
+
+- To look at the documentation for any function, use `?` or `help()`
+  - How to read help: https://socviz.co/appendix.html#a-little-more-about-r
+- Package-specific walkthroughs:`vignette(package = "dplyr")`
+- [R tag on Stats Stack Exchange - stats.stackexchange.com](https://stats.stackexchange.com/questions/tagged/r)
+
+## Resources
+
+- [R for Data Science - https://r4ds.had.co.nz/](https://r4ds.had.co.nz/)
+- [Cheat Sheets - https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/)
+- [Helpful cartoons - https://github.com/allisonhorst/stats-illustrations](https://github.com/allisonhorst/stats-illustrations)
+- [Tidy Tuesday - Weekly analysis screencasts](https://github.com/rfordatascience/tidytuesday) [on youtube](https://www.youtube.com/playlist?list=PL19ev-r1GBwkuyiwnxoHTRC8TTqP8OEi8)
 
 # Questions?
 
@@ -624,20 +760,24 @@ tidyr::who %>%
 
 ## Everything else
 
-- `forcats`
-- `stringr`
-- `lubridate`
-- `tidymodels`
+- `forcats   ` - work with factors
+- `stringr   ` - work with strings
+- `lubridate ` - work with dates
+- `tidymodels` - work with stats/ML algorithms
+- `reticulate` - work with Python
 
 ## How to get help
 
-To look at the documentation for any function, use `?` or `help()`
-
-How to read help: https://socviz.co/appendix.html#a-little-more-about-r
+- To look at the documentation for any function, use `?` or `help()`
+  - How to read help: https://socviz.co/appendix.html#a-little-more-about-r
+- Package-specific walkthroughs:`vignette(package = "dplyr")`
+- [R tag on Stats Stack Exchange - stats.stackexchange.com](https://stats.stackexchange.com/questions/tagged/r)
 
 ## Resources
 
 - [R for Data Science - https://r4ds.had.co.nz/](https://r4ds.had.co.nz/)
 - [Cheat Sheets - https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/)
+- [Helpful cartoons - https://github.com/allisonhorst/stats-illustrations](https://github.com/allisonhorst/stats-illustrations)
+- [Tidy Tuesday - Weekly analysis screencasts](https://github.com/rfordatascience/tidytuesday) [on youtube](https://www.youtube.com/playlist?list=PL19ev-r1GBwkuyiwnxoHTRC8TTqP8OEi8)
 
 

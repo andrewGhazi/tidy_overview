@@ -102,6 +102,15 @@ diabetes %>%
 
 
 ## -----------------------------------------------------------------------------
+diabetes %>% 
+  select(starts_with('b'), matches('diab'))
+
+
+## -----------------------------------------------------------------------------
+diabetes %>% arrange(bmi)
+
+
+## -----------------------------------------------------------------------------
 diabetes %>% arrange(age)
 
 
@@ -112,39 +121,48 @@ diabetes %>% arrange(age)
 
 ## -----------------------------------------------------------------------------
 diabetes %>% 
+  mutate(index = 1:532)
+
+
+## -----------------------------------------------------------------------------
+diabetes %>% 
   mutate(birth_year = 2021 - age)
 
 
 ## -----------------------------------------------------------------------------
 diabetes %>% 
-  mutate(is_mother = npreg > 0) %>% 
-  group_by(is_mother)
+  group_by(diabetic)
+
+
+## -----------------------------------------------------------------------------
+diabetes %>% 
+  group_by(diabetic) %>% 
+  summarise(mean_age = mean(age))
 
 
 ## -----------------------------------------------------------------------------
 diabetes %>% 
   mutate(is_mother = npreg > 0) %>% 
-  group_by(is_mother) %>% 
-  summarise(mean_age = mean(age),
-            prop_diabetic = sum(diabetic == "Yes")/ n())
+  group_by(diabetic, is_mother) %>% 
+  summarise(mean_age = mean(age))
 
 
 
 
-## ----fig.height=3.7-----------------------------------------------------------
+## ----fig.height=3.1-----------------------------------------------------------
 diabetes %>% 
-  ggplot(aes(x = bmi, y = glu)) + 
+  ggplot(mapping = aes(x = bmi, y = glu)) + 
   geom_point()
 
 
-## ----fig.height=3.7-----------------------------------------------------------
+## ----fig.height=3.1-----------------------------------------------------------
 diabetes %>% 
   mutate(is_mother = npreg > 0) %>% 
-  ggplot(aes(x = is_mother, y = age)) + 
+  ggplot(aes(is_mother, age)) + 
   geom_boxplot()
 
 
-## ----echo = FALSE, out.width='100%', fig.align='center'-----------------------
+## ----echo = FALSE, out.width='75%', fig.align='center'------------------------
 knitr::include_graphics('images/geoms.png')
 
 
@@ -161,12 +179,57 @@ state_covid
 
 ## ----eval = FALSE-------------------------------------------------------------
 ## state_covid %>%
-##   filter(state == "Washington") %>%
-##   mutate(new_deaths = c(NA, diff(deaths))) %>%
+##   filter(state == "California") %>%
+##   ggplot(aes(date, deaths)) +
+##   geom_line()
+
+
+## -----------------------------------------------------------------------------
+state_covid %>% 
+  filter(state == "California") %>% 
+  ggplot(aes(date, deaths)) +
+  geom_line()
+
+
+## ----eval = FALSE-------------------------------------------------------------
+## state_covid %>%
+##   filter(state == "California", deaths > 0)
+
+
+## ----eval=FALSE---------------------------------------------------------------
+## state_covid %>%
+##   filter(state == "California") %>%
+##   mutate(new_deaths = diff(deaths))
+
+
+## ----error=TRUE---------------------------------------------------------------
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = diff(deaths))
+
+
+## -----------------------------------------------------------------------------
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) 
+
+
+## ----fig.height=3-------------------------------------------------------------
+state_covid %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) %>% 
+  ggplot(aes(date, new_deaths)) +
+  geom_point() 
+
+
+## ----eval = FALSE-------------------------------------------------------------
+## state_covid %>%
+##   filter(state == "California") %>%
+##   mutate(new_deaths = c(deaths[1], diff(deaths))) %>%
 ##   ggplot(aes(date, new_deaths)) +
 ##   geom_point() +
 ##   geom_smooth(method = "loess", span = .2) +
-##   labs(title = "Daily new deaths in Washington",
+##   labs(title = "Daily new deaths in California",
 ##        y = "New Deaths",
 ##        caption = "Data from the New York Times: https://github.com/nytimes/covid-19-data") +
 ##   theme_bw()
@@ -174,15 +237,23 @@ state_covid
 
 ## ----echo = FALSE, message = FALSE, warning = FALSE, out.width="90%"----------
 state_covid %>% 
-  filter(state == "Washington") %>% 
-  mutate(new_deaths = c(NA, diff(deaths))) %>% 
+  filter(state == "California") %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) %>% 
   ggplot(aes(date, new_deaths)) +
   geom_point() + 
   geom_smooth(method = "loess", span = .2) + 
-  labs(title = "Daily new deaths in Washington",
+  labs(title = "Daily new deaths in California",
        y = "New Deaths",
        caption = "Data from the New York Times: https://github.com/nytimes/covid-19-data") + 
   theme_bw()
+
+
+## -----------------------------------------------------------------------------
+state_covid %>% 
+  group_by(state) %>% 
+  mutate(new_deaths = c(NA, diff(deaths))) %>% 
+  summarise(state_max = max(new_deaths, na.rm = TRUE)) %>% 
+  arrange(desc(state_max))
 
 
 ## -----------------------------------------------------------------------------
