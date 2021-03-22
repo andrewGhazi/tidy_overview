@@ -15,7 +15,7 @@ options(knitr.duplicate.label = "allow")
 knitr::purl("./tidy_overview.Rmd", output = "R/tidy_overview.R")
 ```
 
-## While people are joining the meeting
+## While we wait...
 
 1. Install R from [cran.r-project.org](cran.r-project.org)
 2. Install Rstudio from [rstudio.com](rstudio.com)
@@ -441,6 +441,8 @@ state_covid %>%
        caption = "Data from the New York Times: https://github.com/nytimes/covid-19-data") + 
   theme_bw()
 ```
+
+- Try plotting several states with different colors (hints: use `%in%` and `aes(color = ...)`)
 
 # Questions?
 
