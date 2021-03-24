@@ -45,10 +45,7 @@ input = "potatoes"
 
 stick(mash(boil(input)), where = 'stew')
 
-input %>% 
-  boil() %>% 
-  mash() %>% 
-  stick(where = 'stew')
+input %>% boil() %>% mash() %>% stick(where = 'stew')
 
 
 ## ----eval = FALSE-------------------------------------------------------------
