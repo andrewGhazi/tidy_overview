@@ -42,7 +42,7 @@ knitr::include_graphics('images/tidyverse-logo.png')
 - Easy to learn, write, and read
 - It's ubiquitous
 
-```{r out.width="80%", echo = FALSE, purl=FALSE}
+```{r out.width="80%", echo = FALSE, purl=FALSE, fig.cap="Diagram from R for Data Science by Wickham et al."}
 knitr::include_graphics("images/data-science.png")
 ```
 
@@ -62,16 +62,16 @@ knitr::include_graphics('images/kitchen.jpg')
 ```
 </div>
 
-## A note
+## How to read these slides
 
 - Lecture notes show up like this.
-- `package::function` e.g. `dplyr::filter`
 
 ```{r}
 print("Console output has two pound symbols in front.")
 x = 5 
 ```
-Assignment prints nothing.
+- Assignment prints nothing.
+- `package::function()` e.g. `dplyr::filter()`
 
 ## Load the tidyverse
 
@@ -106,9 +106,10 @@ diabetes
 
 ## tidyverse functions
 
+- data frame in, data frame out
 - Function names are *verbs*
   - e.g. `filter`, `arrange`, `mutate`
-- data frame in, data frame out
+
 
 ## Pipes
 
@@ -315,7 +316,7 @@ diabetes %>%
 
 ## `dplyr::mutate()`
 
-- Add new columns
+- Refer to other columns by name
 - Example: Calculate birth year as a function of age
 ```{r}
 diabetes %>% 
@@ -370,6 +371,16 @@ diabetes %>%
 ```{r}
 diabetes %>% 
   mutate(is_mother = npreg > 0) %>% 
+  group_by(diabetic, is_mother) 
+```
+
+## `dplyr::summarise()`
+
+- You can group by multiple variables
+
+```{r}
+diabetes %>% 
+  mutate(is_mother = npreg > 0) %>% 
   group_by(diabetic, is_mother) %>% 
   summarise(mean_age = mean(age))
 ```
@@ -380,7 +391,7 @@ diabetes %>%
 - Core concepts:
   - Variables from tidy input data
   - Aesthetic mappings between variables and graphical elements: `aes()`
-  - Graphical elements via `geom_*()` e.g. `geom_point()`
+  - Add geometric objects to represent data via `geom_*()` e.g. `geom_point()`
   
 ```{r echo = FALSE, out.width = "80%", purl=FALSE}
 knitr::include_graphics("images/ggplot2.png")
@@ -391,7 +402,7 @@ knitr::include_graphics("images/ggplot2.png")
 ## Visualize - `ggplot2` example
 
 - Tidy input, aesthetic mapping, and a geom
-```{r fig.height=3.1}
+```{r fig.height=3.2}
 diabetes %>% 
   ggplot(mapping = aes(x = age, y = bp)) + 
   geom_point()
@@ -412,8 +423,9 @@ knitr::include_graphics('images/geoms.png')
 
 ## Report - `rmarkdown`
 <div class="columns-2">
-- Easily interweave code, plots, $\LaTeX$, and text.
-- Render as reports (.html, .docx, .pdf), slides (.html, .ppt), or web applications (Shiny)
+- Communicate analysis results
+- Easily interweave notes, code, plots, and $\LaTeX$ in a single file
+- Render as reports (.docx, .pdf, .html), slides (.html, .ppt), or web applications (Shiny)
 - Rmd + Github = Digital lab notebook
 - Demonstration at end of session 1 if there's time
 
@@ -428,8 +440,8 @@ knitr::include_graphics("images/rmd.png")
 ## COVID-19 data
 
 * New York Times COVID-19 data on Github
-* Provides COVID-19 data by county, state, and nation-wide
 * https://github.com/nytimes/covid-19-data
+* Provides COVID-19 data by county, state, and nation-wide
 
 ## Example: US COVID-19 state-level data
 
@@ -438,7 +450,7 @@ nyt_url = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-sta
 state_covid = read_csv(nyt_url)
 ```
 
-## Example: US COVID-19 state-level data
+## Example: Import state-level COVID-19 data
 
 - Look at the data
 
@@ -486,7 +498,7 @@ state_covid %>%
   filter(state == "California") %>% 
   mutate(new_deaths = diff(deaths))
 ```
-## Example: COVID-19 in California
+## That didn't work
 
 - Define daily added deaths using `diff()`
 ```{r error=TRUE}
@@ -495,7 +507,7 @@ state_covid %>%
   mutate(new_deaths = diff(deaths))
 ```
 
-## That didn't work.
+## The fix
 
 - `diff()` returns a vector that's one element too short -- tack on the first observation at the start.
 
@@ -506,9 +518,8 @@ state_covid %>%
 ```
 
 
-## Example: COVID-19 in California
+## Example: New deaths over time
 
-- Define daily added deaths using `diff()`
 ```{r fig.height=3}
 state_covid %>% 
   filter(state == "California") %>% 
@@ -581,7 +592,7 @@ state_covid %>%
 - To look at the documentation for any function, use `?` or `help()`
   - `?summarise`
   - How to read help: https://socviz.co/appendix.html#a-little-more-about-r
-- Package-specific walkthroughs:`vignette(package = "dplyr")`
+- Package-specific walkthroughs: `vignette(package = "dplyr")`
 - [R tag on Stats Stack Exchange - stats.stackexchange.com](https://stats.stackexchange.com/questions/tagged/r)
 
 ## Resources

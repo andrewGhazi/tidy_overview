@@ -148,13 +148,19 @@ diabetes %>%
 ## -----------------------------------------------------------------------------
 diabetes %>% 
   mutate(is_mother = npreg > 0) %>% 
+  group_by(diabetic, is_mother) 
+
+
+## -----------------------------------------------------------------------------
+diabetes %>% 
+  mutate(is_mother = npreg > 0) %>% 
   group_by(diabetic, is_mother) %>% 
   summarise(mean_age = mean(age))
 
 
 
 
-## ----fig.height=3.1-----------------------------------------------------------
+## ----fig.height=3.2-----------------------------------------------------------
 diabetes %>% 
   ggplot(mapping = aes(x = age, y = bp)) + 
   geom_point()
