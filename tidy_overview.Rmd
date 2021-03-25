@@ -1,6 +1,6 @@
 ---
 title: "tidyverse overview"
-author: "Andrew Ghazi"
+author: "Andrew Ghazi - aghazi@broadinstitute.org"
 date: "March 25th 2021 - Rendered at `r Sys.time()`"
 output:
   ioslides_presentation:
