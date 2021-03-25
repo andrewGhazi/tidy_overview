@@ -1,6 +1,5 @@
 ## -----------------------------------------------------------------------------
-print('R code looks like this.')
-print('Console output has two pound symbols in front.')
+print("Console output has two pound symbols in front.")
 x = 5 
 
 
@@ -55,10 +54,6 @@ input %>% boil() %>% mash() %>% stick(where = 'stew')
 ##   stick(where = 'stew')
 
 
-## -----------------------------------------------------------------------------
-diabetes
-
-
 ## ----message = FALSE----------------------------------------------------------
 data_path = "data/diabetes.tsv"
 diabetes = read_tsv(data_path)
@@ -108,7 +103,7 @@ diabetes %>% arrange(bmi)
 
 
 ## -----------------------------------------------------------------------------
-diabetes %>% arrange(age)
+diabetes %>% arrange(desc(age))
 
 
 ## ----eval = FALSE-------------------------------------------------------------
@@ -128,6 +123,12 @@ diabetes %>%
 
 ## -----------------------------------------------------------------------------
 diabetes %>% 
+  mutate(birth_year = 2021 - age,
+         is_mother = npreg > 0)
+
+
+## -----------------------------------------------------------------------------
+diabetes %>% 
   group_by(diabetic)
 
 
@@ -135,6 +136,13 @@ diabetes %>%
 diabetes %>% 
   group_by(diabetic) %>% 
   summarise(mean_age = mean(age))
+
+
+## -----------------------------------------------------------------------------
+diabetes %>% 
+  group_by(diabetic) %>% 
+  summarise(mean_age = mean(age),
+            group_size = n())
 
 
 ## -----------------------------------------------------------------------------
@@ -148,7 +156,7 @@ diabetes %>%
 
 ## ----fig.height=3.1-----------------------------------------------------------
 diabetes %>% 
-  ggplot(mapping = aes(x = bmi, y = glu)) + 
+  ggplot(mapping = aes(x = age, y = bp)) + 
   geom_point()
 
 
@@ -181,16 +189,16 @@ state_covid
 ##   geom_line()
 
 
-## -----------------------------------------------------------------------------
+## ----out.width="50%"----------------------------------------------------------
 state_covid %>% 
   filter(state == "California") %>% 
   ggplot(aes(date, deaths)) +
   geom_line()
 
 
-## ----eval = FALSE-------------------------------------------------------------
-## state_covid %>%
-##   filter(state == "California", deaths > 0)
+## -----------------------------------------------------------------------------
+state_covid %>% 
+  filter(state == "California", deaths > 0) 
 
 
 ## ----eval=FALSE---------------------------------------------------------------
@@ -248,8 +256,8 @@ state_covid %>%
 ## -----------------------------------------------------------------------------
 state_covid %>% 
   group_by(state) %>% 
-  mutate(new_deaths = c(NA, diff(deaths))) %>% 
-  summarise(state_max = max(new_deaths, na.rm = TRUE)) %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) %>% 
+  summarise(state_max = max(new_deaths)) %>% 
   arrange(desc(state_max))
 
 

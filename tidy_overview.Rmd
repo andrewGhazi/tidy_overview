@@ -20,37 +20,36 @@ knitr::purl("./tidy_overview.Rmd", output = "R/tidy_overview.R")
 1. Install R from [cran.r-project.org](cran.r-project.org)
 2. Install Rstudio from [rstudio.com](rstudio.com)
 3. Install the tidyverse with this R command: `install.packages("tidyverse")`
-4. Get the slides (.html) and/or code (.R) if you'd like to follow along: [github.com/andrewGhazi/tidy_overview](github.com/andrewGhazi/tidy_overview)
+4. If you'd like to follow along, get the slides (.html) and/or code (.R): [github.com/andrewGhazi/tidy_overview](github.com/andrewGhazi/tidy_overview)
 
 ## What is the tidyverse?
 
 <div class="columns-2">
 - A dialect of R
-- A suite of R packages with a shared design philosophy
+- A collection of R packages with a shared design philosophy
+<br/><br/><br/>
+- Install it with this R command: `install.packages("tidyverse")`
 
-- Install it with this R command: `install.packages('tidyverse')`
-
-```{r echo=FALSE, out.height="95%", out.width="95%", purl=FALSE}
+```{r echo=FALSE,  out.width="95%", purl=FALSE}
 knitr::include_graphics('images/tidyverse-logo.png')
 ```
 </div>
 
 ## Why use the tidyverse?
 
-- Design goal: Lower the cognitive burden on users
-- Shared design philosophy --> inter-package consistency
+- Shared design philosophy → inter-package consistency
 - Focused on data science and statistical analysis
 - Easy to learn, write, and read
 - It's ubiquitous
 
-```{r out.width="100%", echo = FALSE, purl=FALSE}
+```{r out.width="80%", echo = FALSE, purl=FALSE}
 knitr::include_graphics("images/data-science.png")
 ```
 
 ## Outline
 
 <div class="columns-2">
-* Basic concepts
+* Core concepts
 * Package overview
 * End-to-end example
 * Questions
@@ -65,11 +64,11 @@ knitr::include_graphics('images/kitchen.jpg')
 
 ## A note
 
-Lecture notes show up like this.
+- Lecture notes show up like this.
+- `package::function` e.g. `dplyr::filter`
 
 ```{r}
-print('R code looks like this.')
-print('Console output has two pound symbols in front.')
+print("Console output has two pound symbols in front.")
 x = 5 
 ```
 Assignment prints nothing.
@@ -82,7 +81,7 @@ The startup message lists loaded packages and overwritten functions.
 library(tidyverse)
 ```
 
-# Basic concepts
+# Core concepts
 
 ## Data frames
 
@@ -188,19 +187,12 @@ input %>%
 
 # package overview 
 
-## Diabetes dataset
-
-* Adapted from R package `MASS` (not a tidyverse package)
-* Describes incidence of diabetes in 532 Pima Indian women along with several health-related variables
-```{r}
-diabetes
-```
 ## Import - `readr`
 
 <div class="columns-2">
 - Get the data into R as a data frame.
 - Read data from a file on your computer or from a URL
-- `read_csv()`, `read_tsv()`, `read_delim()`
+- `read_csv()`, `read_tsv()`
 - related package: `readxl`
 - Read in the diabetes example dataset:
 
@@ -230,6 +222,7 @@ write_tsv(diabetes, 'data/diabetes.tsv')
 <div class="columns-2">
 - Package for basic data manipulation
 - Most important functions: `filter()`, `select()`, `arrange()`, `mutate()`, `group_by()`, `summarise()`
+- Focused on data frames
 
 ```{r echo=FALSE, out.height="95%", out.width="95%", purl=FALSE}
 knitr::include_graphics('images/dplyr_logo.png')
@@ -297,7 +290,7 @@ diabetes %>% arrange(bmi)
 - Reorder rows by a variable
 
 ```{r}
-diabetes %>% arrange(age)
+diabetes %>% arrange(desc(age))
 ```
 
 Quiz: What's the highest blood pressure observed in this data? (hint: desc())
@@ -329,6 +322,16 @@ diabetes %>%
   mutate(birth_year = 2021 - age)
 ```
 
+## `dplyr::mutate()`
+
+- Add new columns
+- Example: Calculate birth year as a function of age
+```{r}
+diabetes %>% 
+  mutate(birth_year = 2021 - age,
+         is_mother = npreg > 0)
+```
+
 ## `dplyr::group_by()`
 
 - Group a data frame
@@ -352,6 +355,16 @@ diabetes %>%
 ## `dplyr::summarise()`
 
 - Compute summary values by group
+
+```{r}
+diabetes %>% 
+  group_by(diabetic) %>% 
+  summarise(mean_age = mean(age),
+            group_size = n())
+```
+
+## `dplyr::summarise()`
+
 - You can group by multiple variables
 
 ```{r}
@@ -380,7 +393,7 @@ knitr::include_graphics("images/ggplot2.png")
 - Tidy input, aesthetic mapping, and a geom
 ```{r fig.height=3.1}
 diabetes %>% 
-  ggplot(mapping = aes(x = bmi, y = glu)) + 
+  ggplot(mapping = aes(x = age, y = bp)) + 
   geom_point()
 ```
 
@@ -450,7 +463,7 @@ state_covid %>%
 
 - Plot one state over time
 
-```{r}
+```{r out.width="50%"}
 state_covid %>% 
   filter(state == "California") %>% 
   ggplot(aes(date, deaths)) +
@@ -460,7 +473,7 @@ state_covid %>%
 ## Example: COVID-19 in California
 
 - Want to define the CHANGE in deaths
-```{r eval = FALSE}
+```{r}
 state_covid %>% 
   filter(state == "California", deaths > 0) 
 ```
@@ -540,11 +553,11 @@ state_covid %>%
 
 ## Example: US COVID-19
 
-- What was the highest daily increase in death in any state?
+- What states had the highest daily new deaths?
 
 ## Example: US COVID-19
 
-- What was the highest daily increase in death in any state?
+- What states had the highest daily new deaths?
 - What do we need to do?
 
 ## Example: US COVID-19
@@ -554,8 +567,8 @@ state_covid %>%
 ```{r}
 state_covid %>% 
   group_by(state) %>% 
-  mutate(new_deaths = c(NA, diff(deaths))) %>% 
-  summarise(state_max = max(new_deaths, na.rm = TRUE)) %>% 
+  mutate(new_deaths = c(deaths[1], diff(deaths))) %>% 
+  summarise(state_max = max(new_deaths)) %>% 
   arrange(desc(state_max))
 ```
 
@@ -566,6 +579,7 @@ state_covid %>%
 ## How to get help
 
 - To look at the documentation for any function, use `?` or `help()`
+  - `?summarise`
   - How to read help: https://socviz.co/appendix.html#a-little-more-about-r
 - Package-specific walkthroughs:`vignette(package = "dplyr")`
 - [R tag on Stats Stack Exchange - stats.stackexchange.com](https://stats.stackexchange.com/questions/tagged/r)
@@ -574,7 +588,6 @@ state_covid %>%
 
 - [R for Data Science - https://r4ds.had.co.nz/](https://r4ds.had.co.nz/)
 - [Cheat Sheets - https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/)
-- [Helpful cartoons - https://github.com/allisonhorst/stats-illustrations](https://github.com/allisonhorst/stats-illustrations)
 - [Tidy Tuesday - Weekly analysis screencasts](https://github.com/rfordatascience/tidytuesday) [on youtube](https://www.youtube.com/playlist?list=PL19ev-r1GBwkuyiwnxoHTRC8TTqP8OEi8)
 
 # Questions?
