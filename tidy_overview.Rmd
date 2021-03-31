@@ -605,9 +605,155 @@ state_covid %>%
 
 # Day 2
 
+## While we wait...
+
+1. Install R from [cran.r-project.org](cran.r-project.org)
+2. Install Rstudio from [rstudio.com](rstudio.com)
+3. Install the tidyverse with this R command: `install.packages("tidyverse")`
+4. If you'd like to follow along, get the slides (.html) and/or code (.R): [github.com/andrewGhazi/tidy_overview](github.com/andrewGhazi/tidy_overview)
+
+## Follow up
+
+```{r out.width="90%", echo = FALSE, purl=FALSE}
+knitr::include_graphics('images/issue.PNG')
+```
+
+## Follow up
+
+```{r out.width="90%", echo = FALSE, purl=FALSE}
+knitr::include_graphics('images/google.PNG')
+```
+
+## Organize - `tidyr`
+
+<div class="columns-2">
+- `pivot_longer()` and `pivot_wider()`
+- `separate()` and `unite()`
+
+```{r out.width="90%", echo = FALSE, purl=FALSE}
+knitr::include_graphics('images/tidyr.PNG')
+```
+</div>
+
+## `tidyr::separate()`
+
+- Separate one column into multiple
+
+```{r}
+tibble(x = c("a;b", "a;d", "b;c")) %>% 
+  separate(x, 
+           into = c("A", "B"),
+           sep = ";")
+```
+
+## `tidyr::unite()`
+
+- Unite multiple columns into one
+```{r}
+tibble(x = c("a", "b", "c"),
+       y = c("d", "e", "f")) %>% 
+  unite(col = "id",
+        x, y,
+        sep = ";")
+```
+
+## tidy data - long vs wide format 
+
+```{r out.width="80%", echo = FALSE, purl=FALSE}
+knitr::include_graphics('images/wide_long.png')
+```
+
+## `tidyr::pivot_longer()` and `pivot_wider()`
+
+```{r out.width="70%", echo = FALSE, purl=FALSE}
+knitr::include_graphics('images/tidyr-spread-gather.gif')
+```
+
+## Data tidying example: WHO TB data
+
+* WHO tuberculosis case data
+* realistically messy!
+* Try running these commands:
+
+```{r eval = FALSE}
+?tidyr::who
+dim(who)
+names(who)
+who[1:5, 1:8]
+who
+```
+
+* We will tidy this data in 5 steps
+
+## WHO TB column names
+
+* First part: "new" or "old"
+* Second part: TB type (relapse, extrapulmonary, smear-positive, smear-negative)
+* Third part: Sex and age group (e.g. f2534)
+
+## TB tidying 1/5: pivot wide to long
+
+```{r}
+who1 = who %>% 
+  pivot_longer(new_sp_m014:newrel_f65, 
+               names_to = "key", 
+               values_to = "values", 
+               values_drop_na = TRUE)
+who1
+```
+
+## TB tidying 2/5: fix inconsistent names
+```{r}
+who2 = who1 %>% 
+  mutate(key = str_replace(key, "newrel", "new_rel"))
+who2
+```
+
+## TB tidying 3/5: separate identifier components
+
+```{r}
+who3 = who2 %>% 
+  separate(key, into = c("newold", "tb_type", "sexage"))
+```
+
+## TB tidying 4/5: separate sex and age group
+
+```{r}
+who4 = who3 %>% 
+  separate(sexage, into = c("sex", "age_group"), sep = 1)
+```
+
+## TB tidying 5/5: remove redundant columns
+
+```{r}
+who_final = who4 %>% 
+  select(-newold, -matches("iso"))
+```
+
+
+## TB tidying: Final command
+
+```{r}
+tidyr::who %>% 
+  pivot_longer(new_sp_m014:newrel_f65, 
+               names_to = "key", 
+               values_to = "values", 
+               values_drop_na = TRUE) %>%
+  mutate(key = str_replace(key, "newrel", "new_rel")) %>%
+  separate(key, into = c("newold", "tb_type", "sexage")) %>% 
+  separate(sexage, into = c("sex", "age_group"), sep = 1) %>% 
+  select(-newold, -matches("iso"))
+```
+
 ## `purrr`
+<div class="columns-2">
 
 - Functional programming
+```{r out.width="90%", echo = FALSE, purl=FALSE}
+knitr::include_graphics('images/purrr.png')
+```
+
+</div>
 
 ## `map()`
 
@@ -693,87 +839,6 @@ formula_df %>%
          aic = map_dbl(lm_result,
                        ~.x$aic)) %>% 
   arrange(aic)
-```
-
-## Organize - `tidyr`
-
-- `pivot_longer()` and `pivot_wider()`
-- `separate()` and `unite()`
-
-## Data tidying example: WHO TB data
-
-* WHO tuberculosis case data
-* realistically messy!
-* Try running these commands:
-
-```{r eval = FALSE}
-?tidyr::who
-dim(who)
-names(who)
-who[1:5, 1:8]
-who
-```
-
-* We will tidy this data in 5 steps
-
-## WHO TB column names
-
-* First part: "new" or "old"
-* Second part: TB type (relapse, extrapulmonary, smear-positive, smear-negative)
-* Third part: Sex and age group (e.g. f2534)
-
-## TB tidying 1/5: pivot wide to long
-
-```{r}
-who1 = who %>% 
-  pivot_longer(new_sp_m014:newrel_f65, 
-               names_to = "key", 
-               values_to = "values", 
-               values_drop_na = TRUE)
-who1
-```
-
-## TB tidying 2/5: fix inconsistent names
-```{r}
-who2 = who1 %>% 
-  mutate(key = str_replace(key, "newrel", "new_rel"))
-who2
-```
-
-## TB tidying 3/5: separate identifier components
-
-```{r}
-who3 = who2 %>% 
-  separate(key, into = c("newold", "tb_type", "sexage"))
-```
-
-## TB tidying 4/5: separate sex and age group
-
-```{r}
-who4 = who3 %>% 
-  separate(sexage, into = c("sex", "age_group"), sep = 1)
-```
-
-## TB tidying 5/5: remove redundant columns
-
-```{r}
-who_final = who4 %>% 
-  select(-newold, -matches("iso"))
-```
-
-
-## TB tidying: Final command
-
-```{r}
-tidyr::who %>% 
-  pivot_longer(new_sp_m014:newrel_f65, 
-               names_to = "key", 
-               values_to = "values", 
-               values_drop_na = TRUE) %>%
-  mutate(key = str_replace(key, "newrel", "new_rel")) %>%
-  separate(key, into = c("newold", "tb_type", "sexage")) %>% 
-  separate(sexage, into = c("sex", "age_group"), sep = 1) %>% 
-  select(-newold, -matches("iso"))
 ```
 
 ## Joins if there's time

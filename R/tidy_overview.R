@@ -267,54 +267,29 @@ state_covid %>%
   arrange(desc(state_max))
 
 
-## -----------------------------------------------------------------------------
-map(1:3, sqrt)
+
+
+
+
 
 
 ## -----------------------------------------------------------------------------
-map(1:3, sqrt)
-
-## ----eval = FALSE-------------------------------------------------------------
-## map(datasets, ml_algorithm)
-
-
-## -----------------------------------------------------------------------------
-map_dbl(1:5, ~.x^2 + 1)
-map_lgl(1:5, ~.x == 3)
-map_chr(letters[1:5], ~paste0(rep(.x, 3), collapse=''))
+tibble(x = c("a;b", "a;d", "b;c")) %>% 
+  separate(x, 
+           into = c("A", "B"),
+           sep = ";")
 
 
 ## -----------------------------------------------------------------------------
-formula_df = names(diabetes)[1:7] %>% 
-  combn(m = 2) %>% 
-  t %>% 
-  as_tibble %>% 
-  set_names(c('x1', 'x2')) %>% 
-  mutate(formula = paste("diabetic ~ ", x1, " + ", x2, sep = ''))
-formula_df
+tibble(x = c("a", "b", "c"),
+       y = c("d", "e", "f")) %>% 
+  unite(col = "id",
+        x, y,
+        sep = ";")
 
 
-## ----eval = FALSE-------------------------------------------------------------
-## formula_df %>%
-##   mutate(glm_result = map(formula,
-##                           ~glm(.x, data = diabetes, family = 'binomial')))
 
 
-## ----eval = FALSE-------------------------------------------------------------
-## formula_df %>%
-##   mutate(glm_result = map(formula,
-##                           ~glm(.x, data = diabetes, family = 'binomial')),
-##          aic = map_dbl(lm_result,
-##                        ~.x$aic))
-
-
-## ----eval = FALSE-------------------------------------------------------------
-## formula_df %>%
-##   mutate(glm_result = map(formula,
-##                           ~glm(.x, data = diabetes, family = 'binomial')),
-##          aic = map_dbl(lm_result,
-##                        ~.x$aic)) %>%
-##   arrange(aic)
 
 
 ## ----eval = FALSE-------------------------------------------------------------
@@ -365,4 +340,56 @@ tidyr::who %>%
   separate(key, into = c("newold", "tb_type", "sexage")) %>% 
   separate(sexage, into = c("sex", "age_group"), sep = 1) %>% 
   select(-newold, -matches("iso"))
+
+
+
+
+## -----------------------------------------------------------------------------
+map(1:3, sqrt)
+
+
+## -----------------------------------------------------------------------------
+map(1:3, sqrt)
+
+## ----eval = FALSE-------------------------------------------------------------
+## map(datasets, ml_algorithm)
+
+
+## -----------------------------------------------------------------------------
+map_dbl(1:5, ~.x^2 + 1)
+map_lgl(1:5, ~.x == 3)
+map_chr(letters[1:5], ~paste0(rep(.x, 3), collapse=''))
+
+
+## -----------------------------------------------------------------------------
+formula_df = names(diabetes)[1:7] %>% 
+  combn(m = 2) %>% 
+  t %>% 
+  as_tibble %>% 
+  set_names(c('x1', 'x2')) %>% 
+  mutate(formula = paste("diabetic ~ ", x1, " + ", x2, sep = ''))
+formula_df
+
+
+## ----eval = FALSE-------------------------------------------------------------
+## formula_df %>%
+##   mutate(glm_result = map(formula,
+##                           ~glm(.x, data = diabetes, family = 'binomial')))
+
+
+## ----eval = FALSE-------------------------------------------------------------
+## formula_df %>%
+##   mutate(glm_result = map(formula,
+##                           ~glm(.x, data = diabetes, family = 'binomial')),
+##          aic = map_dbl(lm_result,
+##                        ~.x$aic))
+
+
+## ----eval = FALSE-------------------------------------------------------------
+## formula_df %>%
+##   mutate(glm_result = map(formula,
+##                           ~glm(.x, data = diabetes, family = 'binomial')),
+##          aic = map_dbl(lm_result,
+##                        ~.x$aic)) %>%
+##   arrange(aic)
 
