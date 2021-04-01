@@ -736,7 +736,6 @@ who[1:4, 1:7]
 
 ## WHO TB column names
 
-* examples: `new_ep_m014`, `new_sn_f2534`
 * First part: "new" or "old"
 * Second part: TB type (relapse, extrapulmonary, smear-positive, etc)
 * Third part: Sex and age group
@@ -767,7 +766,7 @@ who2
 
 ```{r}
 who3 = who2 %>% 
-  separate(key, into = c("case_type", "tb_type", "sexage"), sep = "_")
+  separate(key, into = c("case_type", "tb_type", "sex_age"), sep = "_")
 who3
 ```
 
@@ -775,7 +774,7 @@ who3
 
 ```{r}
 who4 = who3 %>% 
-  separate(sexage, into = c("sex", "age_group"), sep = 1)
+  separate(sex_age, into = c("sex", "age_group"), sep = 1)
 who4
 ```
 
@@ -799,8 +798,8 @@ tidyr::who %>%
                values_to = "tb_cases", 
                values_drop_na = TRUE) %>%
   mutate(key = str_replace(key, "newrel", "new_rel")) %>%
-  separate(key, into = c("case_type", "tb_type", "sexage")) %>% 
-  separate(sexage, into = c("sex", "age_group"), sep = 1) %>% 
+  separate(key, into = c("case_type", "tb_type", "sex_age")) %>% 
+  separate(sex_age, into = c("sex", "age_group"), sep = 1) %>% 
   select(-case_type, -matches("iso"))
 ```
 
@@ -825,7 +824,7 @@ sum_of_squares(3, 4)
 
 - So far the columns of our data frames have been "atomic vectors"
   - All the elements of a vector are the same "type": logicals, character strings, integers, etc
-- List columns can contain *any* type of data
+- Lists can contain *any* type of data
 
 ```{r}
 tibble(random_samples = list(rnorm(20), rnorm(20)))
@@ -876,7 +875,7 @@ map(1:3, sqrt) # sqrt(1:3) is better in reality
 - Realistic usage: 
 ```{r eval = FALSE}
 read_and_tidy = function(file_name) {...}
-run_ml_algorithm = function(tidy_dataset) {...}
+run_ml_algorithm = function(tidy_df) {...}
 
 tidy_datasets = map(file_names, read_and_tidy)
 map(tidy_datasets, run_ml_algorithm)
@@ -912,7 +911,7 @@ map_chr(letters[1:5], ~paste(rep(.x, 3), collapse=''))
 Steps:
 
 1. Define each unique pair of biological variables
-2. Run the model for each pair
+2. Run a logistic regression for each pair
 3. Compute a model fit statistic for each pair
 4. See which pair did the best
 
@@ -921,8 +920,6 @@ Steps:
 - Define each combination of two explanatory variables
 
 ```{r warn = FALSE, message = FALSE}
-diabetes = diabetes %>% mutate(is_diabetic = diabetic == "Yes")
-
 colnames(diabetes)[1:7]
 
 colnames(diabetes)[1:7] %>% 
@@ -1002,9 +999,16 @@ knitr::include_graphics('images/inner-join.gif')
 
 ```{r}
 band_members
+band_instruments
+```
+
+## `dplyr::inner_join()`
+
+```{r}
 band_members %>% 
   inner_join(band_instruments, by = "name")
 ```
+
 
 ## Full joins
 
@@ -1022,10 +1026,14 @@ band_members %>% full_join(band_instruments, by = 'name')
 ## Wrap up
 
 <div class="columns-2">
+Galactic core:
 - `forcats   ` - work with factors
 - `stringr   ` - work with strings
 - `lubridate ` - work with dates
-- `tidymodels` - work with stats/ML algorithms
+- `rvest` - web scraping
+
+Outer rim:
+- `tidymodels` - work with stats/ML
 - `reticulate` - work with Python
 
 ```{r echo=FALSE,  out.width="95%", purl=FALSE}
@@ -1038,6 +1046,7 @@ knitr::include_graphics('images/tidyverse-logo.png')
   - How to read help: https://socviz.co/appendix.html#a-little-more-about-r
 - Package-specific walkthroughs:`vignette(package = "dplyr")`
 - [R tag on Stats Stack Exchange - stats.stackexchange.com](https://stats.stackexchange.com/questions/tagged/r)
+- My email: aghazi@broadinstitute.org
 
 ## Resources
 

@@ -342,13 +342,13 @@ who2
 
 ## -----------------------------------------------------------------------------
 who3 = who2 %>% 
-  separate(key, into = c("case_type", "tb_type", "sexage"), sep = "_")
+  separate(key, into = c("case_type", "tb_type", "sex_age"), sep = "_")
 who3
 
 
 ## -----------------------------------------------------------------------------
 who4 = who3 %>% 
-  separate(sexage, into = c("sex", "age_group"), sep = 1)
+  separate(sex_age, into = c("sex", "age_group"), sep = 1)
 who4
 
 
@@ -365,8 +365,8 @@ tidyr::who %>%
                values_to = "tb_cases", 
                values_drop_na = TRUE) %>%
   mutate(key = str_replace(key, "newrel", "new_rel")) %>%
-  separate(key, into = c("case_type", "tb_type", "sexage")) %>% 
-  separate(sexage, into = c("sex", "age_group"), sep = 1) %>% 
+  separate(key, into = c("case_type", "tb_type", "sex_age")) %>% 
+  separate(sex_age, into = c("sex", "age_group"), sep = 1) %>% 
   select(-case_type, -matches("iso"))
 
 
@@ -402,7 +402,7 @@ map(1:3, sqrt)
 
 ## ----eval = FALSE-------------------------------------------------------------
 ## read_and_tidy = function(file_name) {...}
-## run_ml_algorithm = function(tidy_dataset) {...}
+## run_ml_algorithm = function(tidy_df) {...}
 ## 
 ## tidy_datasets = map(file_names, read_and_tidy)
 ## map(tidy_datasets, run_ml_algorithm)
@@ -419,8 +419,6 @@ map_chr(letters[1:5], ~paste(rep(.x, 3), collapse=''))
 
 
 ## ----warn = FALSE, message = FALSE--------------------------------------------
-diabetes = diabetes %>% mutate(is_diabetic = diabetic == "Yes")
-
 colnames(diabetes)[1:7]
 
 colnames(diabetes)[1:7] %>% 
@@ -440,7 +438,7 @@ formula_df
 ## -----------------------------------------------------------------------------
 formula_df %>% 
   mutate(glm_result = map(formula,
-                          ~glm(.x, data = diabetes, family = 'binomial'))) 
+                          ~glm(as.formula(.x), data = diabetes, family = 'binomial'))) 
 
 
 ## -----------------------------------------------------------------------------
@@ -464,6 +462,10 @@ formula_df %>%
 
 ## -----------------------------------------------------------------------------
 band_members
+band_instruments
+
+
+## -----------------------------------------------------------------------------
 band_members %>% 
   inner_join(band_instruments, by = "name")
 
