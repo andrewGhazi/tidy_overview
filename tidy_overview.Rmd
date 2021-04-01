@@ -1027,12 +1027,14 @@ band_members %>% full_join(band_instruments, by = 'name')
 
 <div class="columns-2">
 Galactic core:
+
 - `forcats   ` - work with factors
 - `stringr   ` - work with strings
 - `lubridate ` - work with dates
 - `rvest` - web scraping
 
 Outer rim:
+
 - `tidymodels` - work with stats/ML
 - `reticulate` - work with Python
 
