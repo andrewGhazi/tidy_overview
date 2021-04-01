@@ -603,14 +603,14 @@ state_covid %>%
 
 # Questions?
 
-# Day 2
-
 ## While we wait...
 
 1. Install R from [cran.r-project.org](cran.r-project.org)
 2. Install Rstudio from [rstudio.com](rstudio.com)
 3. Install the tidyverse with this R command: `install.packages("tidyverse")`
 4. If you'd like to follow along, get the slides (.html) and/or code (.R): [github.com/andrewGhazi/tidy_overview](github.com/andrewGhazi/tidy_overview)
+
+# Day 2
 
 ## Follow up
 
@@ -620,15 +620,33 @@ knitr::include_graphics('images/issue.PNG')
 
 ## Follow up
 
-```{r out.width="90%", echo = FALSE, purl=FALSE}
+```{r out.width="50%", echo = FALSE, purl=FALSE}
 knitr::include_graphics('images/google.PNG')
 ```
+
+## Outline
+
+<div class="columns-2">
+
+- Tidying
+  - `tidyr`
+  - tidying example
+- Iteration
+  - Core concepts
+  - `purrr`
+- Joins
+  
+```{r out.width="90%", echo = FALSE, purl=FALSE, fig.cap="Diagram from R for Data Science by Wickham et al."}
+knitr::include_graphics("images/data-science-highlight.png")
+```
+</div>
 
 ## Organize - `tidyr`
 
 <div class="columns-2">
-- `pivot_longer()` and `pivot_wider()`
+- Goal: Wrangle your data into tidy format
 - `separate()` and `unite()`
+- `pivot_longer()` and `pivot_wider()`
 
 ```{r out.width="90%", echo = FALSE, purl=FALSE}
 knitr::include_graphics('images/tidyr.PNG')
@@ -640,64 +658,100 @@ knitr::include_graphics('images/tidyr.PNG')
 - Separate one column into multiple
 
 ```{r}
-tibble(x = c("a;b", "a;d", "b;c")) %>% 
-  separate(x, 
-           into = c("A", "B"),
+tibble(id = c("subj1;ctrl", "subj2;case", "subj3;ctrl"))
+```
+
+## `tidyr::separate()`
+
+- Separate one column into multiple
+
+```{r}
+tibble(id = c("subj1;ctrl", "subj2;case", "subj3;ctrl")) %>% 
+  separate(id, 
+           into = c('subject', 'type'),
            sep = ";")
+```
+
+## `tidyr::unite()`
+
+- The inverse operation
+- Unite multiple columns into one
+```{r}
+tibble(subject = c("subj1", "subj2", "subj3"),
+       type = c("ctrl", "case", "ctrl")) 
 ```
 
 ## `tidyr::unite()`
 
 - Unite multiple columns into one
 ```{r}
-tibble(x = c("a", "b", "c"),
-       y = c("d", "e", "f")) %>% 
+tibble(subject = c("subj1", "subj2", "subj3"),
+       type = c("ctrl", "case", "ctrl"))  %>% 
   unite(col = "id",
-        x, y,
+        subject, type,
         sep = ";")
 ```
 
-## tidy data - long vs wide format 
+## Core concept: wide vs long format 
 
-```{r out.width="80%", echo = FALSE, purl=FALSE}
+- Two ways of representing the same data: 
+```{r out.width="60%", echo = FALSE, purl=FALSE, fig.cap="From https://github.com/gadenbuie/tidyexplain"}
 knitr::include_graphics('images/wide_long.png')
 ```
 
 ## `tidyr::pivot_longer()` and `pivot_wider()`
 
-```{r out.width="70%", echo = FALSE, purl=FALSE}
+```{r out.width="70%", echo = FALSE, purl=FALSE, fig.cap="Adapted from https://github.com/gadenbuie/tidyexplain"}
 knitr::include_graphics('images/tidyr-spread-gather.gif')
 ```
 
-## Data tidying example: WHO TB data
+## `tidyr::pivot_longer()` and `pivot_wider()`
 
-* WHO tuberculosis case data
-* realistically messy!
-* Try running these commands:
+- Syntax: 
 
 ```{r eval = FALSE}
-?tidyr::who
-dim(who)
-names(who)
-who[1:5, 1:8]
-who
+wide %>% 
+  pivot_longer(cols = x:z,
+               names_to = "key",
+               values_to = "val")
 ```
 
+```{r eval = FALSE}
+long %>% 
+  pivot_wider(names_from = key,
+              values_from = val)
+```
+
+# Tidying example: WHO tuberculosis data
+
+## WHO TB data - `tidyr::who`
+
+* realistically messy!
 * We will tidy this data in 5 steps
+
+```{r}
+dim(who)
+who[1:4, 1:7]
+```
 
 ## WHO TB column names
 
+* examples: `new_ep_m014`, `new_sn_f2534`
 * First part: "new" or "old"
-* Second part: TB type (relapse, extrapulmonary, smear-positive, smear-negative)
-* Third part: Sex and age group (e.g. f2534)
+* Second part: TB type (relapse, extrapulmonary, smear-positive, etc)
+* Third part: Sex and age group
+
+```{r}
+names(who)
+```
 
 ## TB tidying 1/5: pivot wide to long
 
 ```{r}
 who1 = who %>% 
-  pivot_longer(new_sp_m014:newrel_f65, 
+  pivot_longer(cols = new_sp_m014:newrel_f65, 
                names_to = "key", 
-               values_to = "values", 
+               values_to = "tb_cases", 
                values_drop_na = TRUE)
 who1
 ```
@@ -705,7 +759,7 @@ who1
 ## TB tidying 2/5: fix inconsistent names
 ```{r}
 who2 = who1 %>% 
-  mutate(key = str_replace(key, "newrel", "new_rel"))
+  mutate(key = stringr::str_replace(key, "newrel", "new_rel"))
 who2
 ```
 
@@ -713,7 +767,8 @@ who2
 
 ```{r}
 who3 = who2 %>% 
-  separate(key, into = c("newold", "tb_type", "sexage"))
+  separate(key, into = c("case_type", "tb_type", "sexage"), sep = "_")
+who3
 ```
 
 ## TB tidying 4/5: separate sex and age group
@@ -721,13 +776,17 @@ who3 = who2 %>%
 ```{r}
 who4 = who3 %>% 
   separate(sexage, into = c("sex", "age_group"), sep = 1)
+who4
 ```
 
 ## TB tidying 5/5: remove redundant columns
 
+- Case types are all "new" and ISO codes are redundant
+
 ```{r}
 who_final = who4 %>% 
-  select(-newold, -matches("iso"))
+  select(-case_type, -matches("iso"))
+who_final
 ```
 
 
@@ -737,25 +796,67 @@ who_final = who4 %>%
 tidyr::who %>% 
   pivot_longer(new_sp_m014:newrel_f65, 
                names_to = "key", 
-               values_to = "values", 
+               values_to = "tb_cases", 
                values_drop_na = TRUE) %>%
   mutate(key = str_replace(key, "newrel", "new_rel")) %>%
-  separate(key, into = c("newold", "tb_type", "sexage")) %>% 
+  separate(key, into = c("case_type", "tb_type", "sexage")) %>% 
   separate(sexage, into = c("sex", "age_group"), sep = 1) %>% 
-  select(-newold, -matches("iso"))
+  select(-case_type, -matches("iso"))
+```
+
+# Iteration
+
+## Core concept - user defined functions
+
+- Syntax example:
+
+```{r}
+sum_of_squares = function(x, y) {
+  x^2 + y^2
+}
+
+sum_of_squares(3, 4)
+```
+
+- If you copy and paste code more than 3 times, you probably need a function.
+- Don't repeat yourself!
+
+## Core concept - list columns
+
+- So far the columns of our data frames have been "atomic vectors"
+  - All the elements of a vector are the same "type": logicals, character strings, integers, etc
+- List columns can contain *any* type of data
+
+```{r}
+tibble(random_samples = list(rnorm(20), rnorm(20)))
+```
+
+## Core concept - list columns
+
+- So far the columns of our data frames have been "atomic vectors"
+  - All the elements of a vector are the same "type": logicals, character strings, integers, etc
+- Lists can contain *any* type of data
+
+```{r}
+tibble(random_samples = list(rnorm(20), rnorm(20)),
+       really_anything = list(diabetes, 
+                              glm((diabetic == "Yes") ~ age + bmi, 
+                                  data = diabetes, 
+                                  family = 'binomial')))
 ```
 
 ## `purrr`
 <div class="columns-2">
 
-- Functional programming
+- "Functional programming" - easier and less error-prone than for loops
+- Apply functions to lists of data
 ```{r out.width="90%", echo = FALSE, purl=FALSE}
 knitr::include_graphics('images/purrr.png')
 ```
 
 </div>
 
-## `map()`
+## `purrr::map()`
 
 - Apply a function to each element of a list
 - Example:
@@ -763,22 +864,32 @@ knitr::include_graphics('images/purrr.png')
 ```{r}
 map(1:3, sqrt)
 ```
+
 ## `map()`
 
 - Apply a function to each element of a list
 - Example:
 
-```{r}
-map(1:3, sqrt)
-```
 ```{r eval = FALSE}
-map(datasets, ml_algorithm)
+map(1:3, sqrt) # sqrt(1:3) is better in reality
+```
+- Realistic usage: 
+```{r eval = FALSE}
+read_and_tidy = function(file_name) {...}
+run_ml_algorithm = function(tidy_dataset) {...}
+
+tidy_datasets = map(file_names, read_and_tidy)
+map(tidy_datasets, run_ml_algorithm)
 ```
 
 ## Anonymous functions
 
-- Tilde + `.x`
-- Use to easily define single-use functions
+- Convenient shorthand: define a single-use function inside the call to `map`
+- Use a `~` then `.x` to refer to the argument
+
+```{r}
+map(1:3, ~sqrt(.x) + 5)
+```
 
 
 ## `map_*()` variants
@@ -787,22 +898,49 @@ map(datasets, ml_algorithm)
 - Variants return a vector of a specific type
 
 ```{r}
-map_dbl(1:5, ~.x^2 + 1)
+map_dbl(1:5, ~sqrt(.x) + 1)
 map_lgl(1:5, ~.x == 3)
-map_chr(letters[1:5], ~paste0(rep(.x, 3), collapse=''))
+map_chr(letters[1:5], ~paste(rep(.x, 3), collapse=''))
 ```
+
+# purrr example: run many models
+
+## purrr example: run many models
+
+- Want to find how to best predict diabetic status from any two biological variables
+
+Steps:
+
+1. Define each unique pair of biological variables
+2. Run the model for each pair
+3. Compute a model fit statistic for each pair
+4. See which pair did the best
 
 ## purrr example: run many models
 
 - Define each combination of two explanatory variables
 
-```{r}
-formula_df = names(diabetes)[1:7] %>% 
-  combn(m = 2) %>% 
-  t %>% 
-  as_tibble %>% 
-  set_names(c('x1', 'x2')) %>% 
-  mutate(formula = paste("diabetic ~ ", x1, " + ", x2, sep = ''))
+```{r warn = FALSE, message = FALSE}
+diabetes = diabetes %>% mutate(is_diabetic = diabetic == "Yes")
+
+colnames(diabetes)[1:7]
+
+colnames(diabetes)[1:7] %>% 
+  combn(m = 2, simplify = FALSE)
+```
+
+## purrr example: run many models
+
+- Define each combination of two explanatory variables
+- The modelling function needs a "formula" e.g. `is_diabetic ~ age + bp`
+
+```{r warn = FALSE, message = FALSE}
+diabetes = diabetes %>% mutate(is_diabetic = diabetic == "Yes")
+
+formula_df = colnames(diabetes)[1:7] %>% 
+  combn(m = 2, simplify = FALSE) %>% 
+  map_chr(~paste("is_diabetic ~ ", .x[1], " + ", .x[2], sep = "")) %>%
+  tibble(formula = .)
 formula_df
 ```
 
@@ -810,21 +948,21 @@ formula_df
 
 - Run a logistic regression on each combination of explanatory variables
 
-```{r eval = FALSE}
+```{r}
 formula_df %>% 
   mutate(glm_result = map(formula,
-                          ~glm(.x, data = diabetes, family = 'binomial'))) 
+                          ~glm(as.formula(.x), data = diabetes, family = 'binomial'))) 
 ```
 
 ## purrr example: run many models
 
 - Extract the AIC of each model fit
 
-```{r eval = FALSE}
+```{r}
 formula_df %>% 
   mutate(glm_result = map(formula,
                           ~glm(.x, data = diabetes, family = 'binomial')),
-         aic = map_dbl(lm_result,
+         aic = map_dbl(glm_result,
                        ~.x$aic)) 
 ```
 
@@ -832,25 +970,67 @@ formula_df %>%
 
 - See which model had the lowest AIC
 
-```{r eval = FALSE}
+```{r}
 formula_df %>% 
   mutate(glm_result = map(formula,
                           ~glm(.x, data = diabetes, family = 'binomial')),
-         aic = map_dbl(lm_result,
+         aic = map_dbl(glm_result,
                        ~.x$aic)) %>% 
   arrange(aic)
 ```
 
-## Joins if there's time
+# Joins
 
+## Core concept - Joins
 
-## Everything else
+- Common data structure: multiple data frames of related data.
+- Example:
+  - patient smoking status, age, weight in DF1 
+  - patient experimental measurements in DF2
+  - both have a `patient_id` column
+- Need both information types together in one mega data frame
+- There are many types joins. We'll examine two.
 
+## Inner joins
+
+- Merge two data frames by a common "key"
+```{r out.width="50%", echo = FALSE, purl=FALSE, fig.cap="From https://github.com/gadenbuie/tidyexplain"}
+knitr::include_graphics('images/inner-join.gif')
+```
+
+## `dplyr::inner_join()`
+
+```{r}
+band_members
+band_members %>% 
+  inner_join(band_instruments, by = "name")
+```
+
+## Full joins
+
+- Merge two data frames by a common "key"
+```{r out.width="50%", echo = FALSE, purl=FALSE, fig.cap="From https://github.com/gadenbuie/tidyexplain"}
+knitr::include_graphics('images/full-join.gif')
+```
+
+## `dplyr::full_join()`
+
+```{r}
+band_members %>% full_join(band_instruments, by = 'name')
+```
+
+## Wrap up
+
+<div class="columns-2">
 - `forcats   ` - work with factors
 - `stringr   ` - work with strings
 - `lubridate ` - work with dates
 - `tidymodels` - work with stats/ML algorithms
 - `reticulate` - work with Python
+
+```{r echo=FALSE,  out.width="95%", purl=FALSE}
+knitr::include_graphics('images/tidyverse-logo.png')
+```
 
 ## How to get help
 
@@ -863,7 +1043,6 @@ formula_df %>%
 
 - [R for Data Science - https://r4ds.had.co.nz/](https://r4ds.had.co.nz/)
 - [Cheat Sheets - https://rstudio.com/resources/cheatsheets/](https://rstudio.com/resources/cheatsheets/)
-- [Helpful cartoons - https://github.com/allisonhorst/stats-illustrations](https://github.com/allisonhorst/stats-illustrations)
 - [Tidy Tuesday - Weekly analysis screencasts](https://github.com/rfordatascience/tidytuesday) [on youtube](https://www.youtube.com/playlist?list=PL19ev-r1GBwkuyiwnxoHTRC8TTqP8OEi8)
 
 

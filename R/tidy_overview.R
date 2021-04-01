@@ -273,18 +273,29 @@ state_covid %>%
 
 
 
+
+
 ## -----------------------------------------------------------------------------
-tibble(x = c("a;b", "a;d", "b;c")) %>% 
-  separate(x, 
-           into = c("A", "B"),
+tibble(id = c("subj1;ctrl", "subj2;case", "subj3;ctrl"))
+
+
+## -----------------------------------------------------------------------------
+tibble(id = c("subj1;ctrl", "subj2;case", "subj3;ctrl")) %>% 
+  separate(id, 
+           into = c('subject', 'type'),
            sep = ";")
 
 
 ## -----------------------------------------------------------------------------
-tibble(x = c("a", "b", "c"),
-       y = c("d", "e", "f")) %>% 
+tibble(subject = c("subj1", "subj2", "subj3"),
+       type = c("ctrl", "case", "ctrl")) 
+
+
+## -----------------------------------------------------------------------------
+tibble(subject = c("subj1", "subj2", "subj3"),
+       type = c("ctrl", "case", "ctrl"))  %>% 
   unite(col = "id",
-        x, y,
+        subject, type,
         sep = ";")
 
 
@@ -293,53 +304,90 @@ tibble(x = c("a", "b", "c"),
 
 
 ## ----eval = FALSE-------------------------------------------------------------
-## ?tidyr::who
-## dim(who)
-## names(who)
-## who[1:5, 1:8]
-## who
+## wide %>%
+##   pivot_longer(cols = x:z,
+##                names_to = "key",
+##                values_to = "val")
+
+
+## ----eval = FALSE-------------------------------------------------------------
+## long %>%
+##   pivot_wider(names_from = key,
+##               values_from = val)
+
+
+## -----------------------------------------------------------------------------
+dim(who)
+who[1:4, 1:7]
+
+
+## -----------------------------------------------------------------------------
+names(who)
 
 
 ## -----------------------------------------------------------------------------
 who1 = who %>% 
-  pivot_longer(new_sp_m014:newrel_f65, 
+  pivot_longer(cols = new_sp_m014:newrel_f65, 
                names_to = "key", 
-               values_to = "values", 
+               values_to = "tb_cases", 
                values_drop_na = TRUE)
 who1
 
 
 ## -----------------------------------------------------------------------------
 who2 = who1 %>% 
-  mutate(key = str_replace(key, "newrel", "new_rel"))
+  mutate(key = stringr::str_replace(key, "newrel", "new_rel"))
 who2
 
 
 ## -----------------------------------------------------------------------------
 who3 = who2 %>% 
-  separate(key, into = c("newold", "tb_type", "sexage"))
+  separate(key, into = c("case_type", "tb_type", "sexage"), sep = "_")
+who3
 
 
 ## -----------------------------------------------------------------------------
 who4 = who3 %>% 
   separate(sexage, into = c("sex", "age_group"), sep = 1)
+who4
 
 
 ## -----------------------------------------------------------------------------
 who_final = who4 %>% 
-  select(-newold, -matches("iso"))
+  select(-case_type, -matches("iso"))
+who_final
 
 
 ## -----------------------------------------------------------------------------
 tidyr::who %>% 
   pivot_longer(new_sp_m014:newrel_f65, 
                names_to = "key", 
-               values_to = "values", 
+               values_to = "tb_cases", 
                values_drop_na = TRUE) %>%
   mutate(key = str_replace(key, "newrel", "new_rel")) %>%
-  separate(key, into = c("newold", "tb_type", "sexage")) %>% 
+  separate(key, into = c("case_type", "tb_type", "sexage")) %>% 
   separate(sexage, into = c("sex", "age_group"), sep = 1) %>% 
-  select(-newold, -matches("iso"))
+  select(-case_type, -matches("iso"))
+
+
+## -----------------------------------------------------------------------------
+sum_of_squares = function(x, y) {
+  x^2 + y^2
+}
+
+sum_of_squares(3, 4)
+
+
+## -----------------------------------------------------------------------------
+tibble(random_samples = list(rnorm(20), rnorm(20)))
+
+
+## -----------------------------------------------------------------------------
+tibble(random_samples = list(rnorm(20), rnorm(20)),
+       really_anything = list(diabetes, 
+                              glm((diabetic == "Yes") ~ age + bmi, 
+                                  data = diabetes, 
+                                  family = 'binomial')))
 
 
 
@@ -347,49 +395,81 @@ tidyr::who %>%
 ## -----------------------------------------------------------------------------
 map(1:3, sqrt)
 
-
-## -----------------------------------------------------------------------------
-map(1:3, sqrt)
 
 ## ----eval = FALSE-------------------------------------------------------------
-## map(datasets, ml_algorithm)
+## map(1:3, sqrt) # sqrt(1:3) is better in reality
+
+
+## ----eval = FALSE-------------------------------------------------------------
+## read_and_tidy = function(file_name) {...}
+## run_ml_algorithm = function(tidy_dataset) {...}
+## 
+## tidy_datasets = map(file_names, read_and_tidy)
+## map(tidy_datasets, run_ml_algorithm)
 
 
 ## -----------------------------------------------------------------------------
-map_dbl(1:5, ~.x^2 + 1)
+map(1:3, ~sqrt(.x) + 5)
+
+
+## -----------------------------------------------------------------------------
+map_dbl(1:5, ~sqrt(.x) + 1)
 map_lgl(1:5, ~.x == 3)
-map_chr(letters[1:5], ~paste0(rep(.x, 3), collapse=''))
+map_chr(letters[1:5], ~paste(rep(.x, 3), collapse=''))
 
 
-## -----------------------------------------------------------------------------
-formula_df = names(diabetes)[1:7] %>% 
-  combn(m = 2) %>% 
-  t %>% 
-  as_tibble %>% 
-  set_names(c('x1', 'x2')) %>% 
-  mutate(formula = paste("diabetic ~ ", x1, " + ", x2, sep = ''))
+## ----warn = FALSE, message = FALSE--------------------------------------------
+diabetes = diabetes %>% mutate(is_diabetic = diabetic == "Yes")
+
+colnames(diabetes)[1:7]
+
+colnames(diabetes)[1:7] %>% 
+  combn(m = 2, simplify = FALSE)
+
+
+## ----warn = FALSE, message = FALSE--------------------------------------------
+diabetes = diabetes %>% mutate(is_diabetic = diabetic == "Yes")
+
+formula_df = colnames(diabetes)[1:7] %>% 
+  combn(m = 2, simplify = FALSE) %>% 
+  map_chr(~paste("is_diabetic ~ ", .x[1], " + ", .x[2], sep = "")) %>%
+  tibble(formula = .)
 formula_df
 
 
-## ----eval = FALSE-------------------------------------------------------------
-## formula_df %>%
-##   mutate(glm_result = map(formula,
-##                           ~glm(.x, data = diabetes, family = 'binomial')))
+## -----------------------------------------------------------------------------
+formula_df %>% 
+  mutate(glm_result = map(formula,
+                          ~glm(.x, data = diabetes, family = 'binomial'))) 
 
 
-## ----eval = FALSE-------------------------------------------------------------
-## formula_df %>%
-##   mutate(glm_result = map(formula,
-##                           ~glm(.x, data = diabetes, family = 'binomial')),
-##          aic = map_dbl(lm_result,
-##                        ~.x$aic))
+## -----------------------------------------------------------------------------
+formula_df %>% 
+  mutate(glm_result = map(formula,
+                          ~glm(.x, data = diabetes, family = 'binomial')),
+         aic = map_dbl(glm_result,
+                       ~.x$aic)) 
 
 
-## ----eval = FALSE-------------------------------------------------------------
-## formula_df %>%
-##   mutate(glm_result = map(formula,
-##                           ~glm(.x, data = diabetes, family = 'binomial')),
-##          aic = map_dbl(lm_result,
-##                        ~.x$aic)) %>%
-##   arrange(aic)
+## -----------------------------------------------------------------------------
+formula_df %>% 
+  mutate(glm_result = map(formula,
+                          ~glm(.x, data = diabetes, family = 'binomial')),
+         aic = map_dbl(glm_result,
+                       ~.x$aic)) %>% 
+  arrange(aic)
+
+
+
+
+## -----------------------------------------------------------------------------
+band_members
+band_members %>% 
+  inner_join(band_instruments, by = "name")
+
+
+
+
+## -----------------------------------------------------------------------------
+band_members %>% full_join(band_instruments, by = 'name')
 
